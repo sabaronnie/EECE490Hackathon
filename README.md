@@ -1,10 +1,10 @@
-### Crop Recommendation System
-### As agriculture is a huge part of our economy in the MENA region, we decided to build a system that helps farmers make accurate agronomic decisions. 
-### The app predicts suitable crops for a given location depending on input information and local environmental conditions.
+## Agriculture Crop Recommendation System
+As agriculture is a huge part of our economy in the MENA region, we decided to build a system that helps farmers make accurate agronomic decisions. 
+The app predicts suitable crops for a given location depending on input information and local environmental conditions.
 
-### Data set used: crop yield fertilizer https://huggingface.co/datasets/Jakehills/Crop_Yield_Fertilizer/viewer/default/train?p=249 
+## Data set used: crop yield fertilizer https://huggingface.co/datasets/Jakehills/Crop_Yield_Fertilizer/viewer/default/train?p=249 
 
-### api
+## API
 ### interactive Streamlit that recommends crops and shows expected yield for a selected city/quarter in the MENA region, combining location-based weather, soil inputs (N, P, K, pH), and fertilizer choice.
 ### User selects a city in the MENA region; coordinates (lon,lat) are then geocoded in the backend using OpenStreetMap (OSM) Nominatim. Openmeteo Archive API in turn fetches seasonal temperature, humidity, and rainfall of that area. We also quarter map the year into 4 quarters of 3 months. Those features are then merged with user input N,P,K and fertilizer details.
 ### The model ranks crops from most to least likely and shows the ones above a chosen probability threshold, and returns the options above a configurable probability threshold, so users can see the top recommendations alongside their confidence scores. Seasonality controls let users explore what time to plant when for better timing decisions.
