@@ -7,17 +7,6 @@ import pandas as pd
 # FEATURES = ["N","P","K","temperature","humidity","ph","rainfall"]
 pipe = joblib.load("models/recommend_pipeline.joblib")
 
-# one row of input features
-Nitrogen = 0
-Phosphorus = 0
-Potassium = 0
-Temperature = 0
-Humidity = 0
-pH = 0
-rainfall = 0
-
-#X_new = np.array([[Nitrogen, Phosphorus, Potassium, Temperature, Humidity, pH, rainfall]])
-
 def callModelOne(Nitrogen, Phosphorus, Potassium, Temperature, Humidity, pH, rainfall):
 
     data = pd.DataFrame([{
@@ -37,7 +26,6 @@ def callModelOne(Nitrogen, Phosphorus, Potassium, Temperature, Humidity, pH, rai
     results = sorted(zip(classes, probs), key=lambda x: x[1], reverse=True)
 
     pairs = sorted(zip(classes, probs), key=lambda t: t[1], reverse=True)
-        # only ≥ 0.5
     print("all pairs:", pairs)  
     # keep those above threshold
 
