@@ -20,4 +20,3 @@
 # WeatherAPI: This FastAPI service provides the environmental conditions needed by the Crop Recommendation System for a user-selected location. It aggregates weather (temperature, humidity, precipitation) and soil pH from free public APIs and returns a compact JSON payload the models can consume.
 
 
-

@@ -2,6 +2,8 @@ pandas
 numpy
 scikit-learn
 joblib
-fastapi
-uvicorn
-pydantic
+streamlit
+requests
+datetime
+json
+time

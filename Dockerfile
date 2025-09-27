@@ -5,7 +5,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends build-essential
 
 # 2) Workdir and copy only requirements first (better layer caching)
 WORKDIR /app
-COPY requirements.txt /app/
+COPY requirements.txt 
 RUN pip install --no-cache-dir -r requirements.txt
 
 # 3) Copy code, data (optional), and trained models
@@ -17,4 +17,4 @@ COPY models /app/models
 EXPOSE 8000
 
 # 5) Default command: serve the API
-CMD ["uvicorn", "api.app:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["streamlit", "api.app:app", "--host", "0.0.0.0", "--port", "8000"]
