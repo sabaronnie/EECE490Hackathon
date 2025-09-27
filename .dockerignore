@@ -1,4 +1,20 @@
-.venv
+# Ignore caches & build artifacts
 __pycache__/
 *.pyc
-.DS_Store
+*.pyo
+*.pyd
+*.log
+*.tmp
+
+# Ignore local dev files
+.vscode/
+.venv/
+.idea/
+
+# Ignore datasets & outputs (don’t bloat the image)
+Datasets/
+outputs/
+
+# Ignore git
+.git/
+.gitignore
