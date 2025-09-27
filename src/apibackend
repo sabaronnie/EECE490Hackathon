@@ -1,0 +1,115 @@
+import os
+from pathlib import Path
+from typing import Optional
+
+import numpy as np
+import httpx
+from fastapi import FastAPI, Query
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse, HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from dotenv import load_dotenv
+
+# your existing scorer from earlier steps
+from .scorer import recommend
+
+load_dotenv()
+
+app = FastAPI(title="Crop Recommender API", version="1.0")
+
+# CORS for local testing and same-origin static page
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # tighten in prod
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# serve /static and /
+STATIC_DIR = Path(__file__).resolve().parents[1] / "static"
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
+
+@app.get("/", response_class=HTMLResponse)
+def index():
+    # Inject Google Maps API key into the HTML at request time
+    key = os.getenv("GOOGLE_MAPS_API_KEY", "YOUR_GOOGLE_MAPS_API_KEY")
+    html = (STATIC_DIR / "index.html").read_text(encoding="utf-8")
+    html = html.replace("{{GOOGLE_MAPS_API_KEY}}", key)
+    return HTMLResponse(html)
+
+
+OPEN_METEO = "https://api.open-meteo.com/v1/forecast"
+SOILGRIDS = "https://rest.isric.org/soilgrids/v2.0/properties/query"
+
+async def get_weather(lat: float, lon: float):
+    params = {
+        "latitude": lat,
+        "longitude": lon,
+        "daily": "temperature_2m_mean,relative_humidity_2m_mean,precipitation_sum",
+        "timezone": "auto",
+        "forecast_days": 14
+    }
+    async with httpx.AsyncClient(timeout=15) as client:
+        r = await client.get(OPEN_METEO, params=params)
+        r.raise_for_status()
+        wx = r.json()["daily"]
+
+    temp = float(np.nanmean(wx["temperature_2m_mean"]))
+    humidity = float(np.nanmean(wx["relative_humidity_2m_mean"]))
+    # total 14-day precipitation in mm; convert to monthly equivalent for the model
+    rain14 = float(np.nansum(wx["precipitation_sum"]))
+    rainfall_month = (rain14 / 14.0) * 30.0
+    return temp, humidity, rainfall_month
+
+
+async def get_soil_ph(lat: float, lon: float) -> Optional[float]:
+    """
+    Optional: SoilGrids pH(H2O) at 0-5cm. Returns pH in 0..14 if available.
+    SoilGrids stores pH * 10 → divide by 10.
+    """
+    params = {
+        "lat": lat,
+        "lon": lon,
+        "property": "phh2o",
+        "depth": "0-5cm"
+    }
+    async with httpx.AsyncClient(timeout=15) as client:
+        r = await client.get(SOILGRIDS, params=params)
+        if r.status_code != 200:
+            return None
+        data = r.json()
+    try:
+        # navigate to the first prediction value
+        ph10 = data["properties"]["layers"][0]["depths"][0]["values"]["M"]  # median
+        return float(ph10) / 10.0
+    except Exception:
+        return None
+
+
+@app.get("/api/recommend")
+async def recommend_by_location(
+    lat: float = Query(..., ge=-90, le=90),
+    lon: float = Query(..., ge=-180, le=180),
+    with_soil: bool = Query(False, description="Try to fetch soil pH from SoilGrids")
+):
+    try:
+        temp, humidity, rainfall_month = await get_weather(lat, lon)
+    except Exception as e:
+        return JSONResponse({"error": f"Weather fetch failed: {e}"}, status_code=502)
+
+    inputs = {
+        "temperature": temp,
+        "humidity": humidity,
+        "rainfall": rainfall_month,
+        # ph, N, P, K will be filled by scorer using medians unless provided:
+    }
+
+    if with_soil:
+        ph = await get_soil_ph(lat, lon)
+        if ph is not None:
+            inputs["ph"] = ph
+
+    results, used = recommend(inputs, top_k=3)
+    return {"inputs_used": used, "recommendations": results}
