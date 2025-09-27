@@ -1,1 +1,0 @@
-{"num_features": ["N", "P", "K", "temperature", "humidity", "ph", "rainfall"], "cat_features": ["label", "fertilizer"], "target": "yield"}
