@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 from typing import List, Tuple, Dict, Any
 from classifierTest import callModelOne
-# configuration
+
 MODEL_B_PATH = Path("models/yield_pipeline.joblib")
 
 NUM_FEATURES = ["N","P","K","temperature","humidity","ph","rainfall"]
@@ -35,28 +35,7 @@ def run_model_b_for_hypotheses(
     min_conf: float = 0.0,
     normalize: bool = True,
 ) -> Dict[str, Any]:
-    """
-    Parameters
-    ----------
-    model_b : fitted sklearn Pipeline (your RandomForest pipeline).
-    base_features : dict with keys for ALL_FEATURES except 'label'. Example:
-        {
-          "N": 90, "P": 42, "K": 43,
-          "temperature": 24.5, "humidity": 60, "ph": 6.5, "rainfall": 140.0,
-          "fertilizer": "npk 20-20-20"
-        }
-    model_a_pairs : list of (crop_label, confidence).
-    top_k : keep only top-k hypotheses (after filtering).
-    min_conf : drop hypotheses with confidence below this.
-    normalize : if True, renormalize confidences to sum to 1 after filtering.
 
-    Returns
-    -------
-    dict with:
-      - "hypotheses": list of dicts [{crop, prob, yield_pred}, ...]
-      - "expected_yield": float (sum_i prob_i * yield_pred_i)
-      - "meta": misc info
-    """
     # Filter by min_conf
     filtered = [(c, p) for (c, p) in model_a_pairs if p >= min_conf]
     # Sort desc by confidence
@@ -121,13 +100,6 @@ def main(Nitrogen, Phosphorus, Potassium, pH, fertilizer, Temperature, Humidity,
     # ---- Load Model B ----
     model_b = joblib.load(MODEL_B_PATH)
 
-    # ---- Example inputs (replace with your real runtime inputs) ----
-    # Model A output (crop, confidence). E.g., from your classifier:
-    # model_a_pairs = [
-    #     ("wheat", 0.62),
-    #     ("rice", 0.28),
-    #     ("maize", 0.10),
-    # ]
 
 
     
