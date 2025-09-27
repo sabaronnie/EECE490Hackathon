@@ -21,7 +21,7 @@ The model ranks crops from most to least likely and returns the ones above a cho
 ### Website displays a weather summary (cards for temperature, humidity, rainfall), a map pin of the selected location, and crop recommendations. 
 
 ## Training 
-###Model A: 
+### Model A: 
 Classification: the data is split into 80% training and 20% testing. This stratification preserves class proportions across training and validation, which stabilizes metrics on imbalanced data. No leakage occurs as preprocessing and modeling are wrapped in a pipeline, so statistics are learned only on the training fold. This Model uses a random forest classfiier, which is a great model for tabulur and classfiable data.
 
 ### Model B: 
@@ -47,4 +47,7 @@ If we plant crop X here, how much yield can we expect? → gives a numeric yield
 This component fuses the two models’ strengths to produce decision-ready outputs. It takes crop candidates and confidences from Model A, evaluates each candidate’s predicted yield via Model B under the same field conditions, and returns both a ranked hypothesis list and a single expected yield summary. 
 
 
-
+##Creatd by:
+- Tracy Ghosn
+- Joey Saade
+- Ronnie Saba
