@@ -47,7 +47,7 @@ If we plant crop X here, how much yield can we expect? → gives a numeric yield
 This component fuses the two models’ strengths to produce decision-ready outputs. It takes crop candidates and confidences from Model A, evaluates each candidate’s predicted yield via Model B under the same field conditions, and returns both a ranked hypothesis list and a single expected yield summary. 
 
 
-##Creatd by:
+## Creatd by:
 - Tracy Ghosn
 - Joey Saade
 - Ronnie Saba
