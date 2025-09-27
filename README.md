@@ -38,6 +38,5 @@ If we plant crop X here, how much yield can we expect? → gives a numeric yield
 ##Training on main: 
 This component fuses the two models’ strengths to produce decision-ready outputs. It takes crop candidates and confidences from Model A, evaluates each candidate’s predicted yield via Model B under the same field conditions, and returns both a ranked hypothesis list and a single expected yield summary. 
 
-### WeatherAPI: This FastAPI service provides the environmental conditions needed by the Crop Recommendation System for a user-selected location. It aggregates weather (temperature, humidity, precipitation) and soil pH from free public APIs and returns a compact JSON payload the models can consume.
 
 
